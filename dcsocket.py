@@ -19,7 +19,7 @@ class DogCamWebSocket():
   def RunServer(self):
     NewLoop = asyncio.new_event_loop()
     asyncio.set_event_loop(NewLoop)
-    NewLoop.run_until_complete(websockets.serve(DCHandler, "0.0.0.0", 5867))
+    NewLoop.run_until_complete(websockets.serve(DCHandler, "", 5867))
     NewLoop.run_forever()
   
 async def DCHandler(websocket, path):
@@ -32,6 +32,10 @@ async def DCHandler(websocket, path):
       print(ex)
       continue
 
+    # Require flags in request
+    if not "servo" in jsonData or not "action" in jsonData:
+      continue
+    
     DCCI = DogCamController.Instance
     ServoName = jsonData["servo"].lower()
     ServoAction = jsonData["action"].lower()
