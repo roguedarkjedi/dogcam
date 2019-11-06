@@ -3,6 +3,8 @@ import asyncio
 import time
 import pytweening
 
+__all__ = ("DogCamController")
+
 class DogCamServo:
   Name=""
   Pin=0
