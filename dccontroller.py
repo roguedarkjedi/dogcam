@@ -49,32 +49,42 @@ class DogCamServo:
     self.__Hardware.stop()
     
   def Reset(self):
-    self.__CurrentAngle = 0
-    self.__TargetAngle = self.__CurrentAngle
+    self.__SetBothAngles(0)
     
     self.__MoveToPosition(0)
     time.sleep(1)
     self.__MoveToPosition(0)
     print(f"{self.Name} reset")
+    
+  def __SetBothAngles(self, angle):
+    self.__TargetAngle = angle
+    self.__CurrentAngle = angle
+    
+  def __SetTargetAngle(self, angle):
+    if angle < 0.0:
+      angle = 0.0
+    elif angle > 180.0:
+      angle = 180.0
+    
+    self.__TargetAngle = angle
 
   def MoveToAbsoluteAngle(self, angle):
     if angle == 0.0:
       self.Reset()
     else:
       self.__MoveToPosition(angle)
-      self.__CurrentAngle = angle
-      self.__TargetAngle = angle
+      self.__SetBothAngles(angle)
       
   def MoveToInterpAngle(self, angle):
     if angle == 0.0:
       self.Reset()
     else:
-      self.__TargetAngle = angle
-      print(f"Moving location to {angle}")
+      self.__SetTargetAngle(angle)
+      print(f"{self.Name}: Moving location to {angle}")
   
   def MoveToRelativeAngle(self, angle):
-    self.__TargetAngle = self.__CurrentAngle + angle
-    print(f"Setting relative location to {self.__TargetAngle}")
+    self.__SetTargetAngle(self.__CurrentAngle + angle)
+    print(f"{self.Name}: Setting relative location to {self.__TargetAngle}")
     
   async def __InterpPosition(self, angle):
     self.__CurrentAngle = angle
@@ -82,7 +92,7 @@ class DogCamServo:
   
   # Moves to exact position, sets no values
   def __MoveToPosition(self, angle):
-    print(f"Moving to position {angle}")
+    print(f"{self.Name}: Moving to position {angle}")
     dutyCycle = angle / self.Pulse + self.Start
     self.__Hardware.ChangeDutyCycle(dutyCycle)
     
@@ -110,12 +120,12 @@ class DogCamServo:
           Movement = Movement*self.__TargetAngle+AdjustedLoc+self.__StepsUp
           WillOverShot = Movement >= self.__TargetAngle
         
-        print(f"Servo {self.Name} moving {Movement} to {self.__TargetAngle}")
+        print(f"{self.Name}: moving {Movement} to {self.__TargetAngle}")
         
-        if WillOverShot:
-          print("We there")
+        if WillOverShot or self.__TargetAngle < 0.0 or self.__TargetAngle > 180.0:
+          print(f"{self.Name}: We there")
           self.__MoveToPosition(self.__TargetAngle)
-          self.__CurrentAngle = self.__TargetAngle
+          self.__SetBothAngles(self.__TargetAngle)
         else:
           await self.__InterpPosition(Movement)
 
