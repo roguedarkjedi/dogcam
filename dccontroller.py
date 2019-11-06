@@ -8,30 +8,30 @@ __all__ = ("DogCamController")
 class DogCamServo:
   Name=""
   Pin=0
+  ShouldLoop=False
   __CurrentAngle=0.0
   __TargetAngle=0.0
   # Servos have odd stepping differences, adjust here
   __StepsUp=0.0
   __StepsDown=0.0
-  Start=0.0
-  Pulse=0.0
-  ShouldLoop=False
+  __Start=0.0
+  __Pulse=0.0
   __Hardware=None
   
   def __init__(self, InName, GPIOPin, InStart, InPulseBound, InStepsUp, InStepsDown):
     self.Name = InName.lower()
     self.Pin = GPIOPin
-    self.Start = InStart
-    self.Pulse = InPulseBound
+    self.__Start = InStart
+    self.__Pulse = InPulseBound
     GPIO.setup(GPIOPin, GPIO.OUT)
     self.__StepsUp = InStepsUp
     self.__StepsDown = InStepsDown
     self.__Hardware = GPIO.PWM(GPIOPin, 50)
-    self.__Hardware.start(self.Start)
+    self.__Hardware.start(self.__Start)
     
     self.Reset()
     
-    print(f"{self.Name} ready for motion")
+    print(f"{self.Name}: ready for motion")
     
     self.ShouldLoop = True
     asyncio.get_event_loop().create_task(self.__ServoLoop())
@@ -43,7 +43,7 @@ class DogCamServo:
       return super().__eq__(Other)
       
   def __del__(self):
-    print(f"Shutting off {self.Name} hardware")
+    print(f"{self.Name}: Shutting off hardware")
     self.ShouldLoop = False
     self.Reset()
     self.__Hardware.stop()
@@ -54,7 +54,7 @@ class DogCamServo:
     self.__MoveToPosition(0)
     time.sleep(1)
     self.__MoveToPosition(0)
-    print(f"{self.Name} reset")
+    print(f"{self.Name}: reset")
     
   def __SetBothAngles(self, angle):
     self.__TargetAngle = angle
@@ -93,7 +93,7 @@ class DogCamServo:
   # Moves to exact position, sets no values
   def __MoveToPosition(self, angle):
     print(f"{self.Name}: Moving to position {angle}")
-    dutyCycle = angle / self.Pulse + self.Start
+    dutyCycle = angle / self.__Pulse + self.__Start
     self.__Hardware.ChangeDutyCycle(dutyCycle)
     
     # Give hardware time to move
@@ -156,6 +156,7 @@ class DogCamController:
   def __del__(self):
     print("Shutting down robot")
     self.ResetAllServos()
+    self.StopServoLoops()
     self.__Servos = {}  
     GPIO.cleanup()
 
@@ -187,3 +188,7 @@ class DogCamController:
   def ResetAllServos(self):
     for name,servo in self.__Servos:
       servo.Reset()
+
+  def StopServoLoops(self):
+    for name,servo in self.__Servos:
+      servo.ShouldLoop = False
