@@ -1,2 +1,3 @@
 # dogcam
-Controllers for doggy cams
+
+The controller software used for the current dog cam.
