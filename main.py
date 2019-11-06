@@ -8,7 +8,10 @@ async def main():
   SocketServer = DogCamWebSocket()
   
   while True:
-    await asyncio.sleep(5)
+    try:
+      await asyncio.sleep(5)
+    except KeyboardInterrupt:
+      return
 
 if __name__ == "__main__":
   asyncio.run(main())
