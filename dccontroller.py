@@ -138,7 +138,7 @@ class DogCamController:
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     self.__Servos = {
-    "pan": DogCamServo("pan", 27, 3.45, 18.0, 1.5, 2.0), 
+    "pan": DogCamServo("pan", 27, 2.2, 18.0, 1.5, 2.0), 
     "tilt": DogCamServo("tilt", 17, 4.5, 18.0, 2.15, 4.0)}
     
     print("Controllers are ready")
