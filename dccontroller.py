@@ -84,7 +84,6 @@ class DogCamServo:
     
     # Do not repeat the duty cycle commands, flush them
     self.__Hardware.ChangeDutyCycle(0)
-    time.sleep(0.1)
     
   async def __ServoLoop(self):
     while self.ShouldLoop is True:
@@ -110,9 +109,10 @@ class DogCamServo:
           print("We there")
           self.__MoveToPosition(self.__TargetAngle)
           self.__CurrentAngle = self.__TargetAngle
-          continue
         else:
           await self.__InterpPosition(Movement)
+
+        continue
         
       await asyncio.sleep(0.1)
     
