@@ -10,17 +10,22 @@ class DogCamServo:
   Pin=0
   __CurrentAngle=0.0
   __TargetAngle=0.0
+  # Servos have odd stepping differences, adjust here
+  __StepsUp=0.0
+  __StepsDown=0.0
   Start=0.0
   Pulse=0.0
   ShouldLoop=False
   __Hardware=None
   
-  def __init__(self, InName, GPIOPin, InStart, InPulseBound):
+  def __init__(self, InName, GPIOPin, InStart, InPulseBound, InStepsUp, InStepsDown):
     self.Name = InName.lower()
     self.Pin = GPIOPin
     self.Start = InStart
     self.Pulse = InPulseBound
     GPIO.setup(GPIOPin, GPIO.OUT)
+    self.__StepsUp = InStepsUp
+    self.__StepsDown = InStepsDown
     self.__Hardware = GPIO.PWM(GPIOPin, 50)
     self.__Hardware.start(self.Start)
     
@@ -65,7 +70,7 @@ class DogCamServo:
       self.Reset()
     else:
       self.__TargetAngle = angle
-      print(f"Setting location to {angle}")
+      print(f"Moving location to {angle}")
   
   def MoveToRelativeAngle(self, angle):
     self.__TargetAngle = self.__CurrentAngle + angle
@@ -97,12 +102,12 @@ class DogCamServo:
           
         # Determine where we should go
         if self.__CurrentAngle > self.__TargetAngle:
-          Movement = pytweening.easeInQuad(self.__TargetAngle / AdjustedLoc)
-          Movement = Movement*-self.__TargetAngle+AdjustedLoc-2.0
+          Movement = pytweening.easeInQuad(abs(self.__TargetAngle / AdjustedLoc))
+          Movement = Movement*-self.__TargetAngle+AdjustedLoc-self.__StepsDown
           WillOverShot = Movement <= self.__TargetAngle
         else:
-          Movement = pytweening.easeInQuad(AdjustedLoc / self.__TargetAngle)
-          Movement = Movement*self.__TargetAngle+AdjustedLoc+2.0
+          Movement = pytweening.easeInQuad(abs(AdjustedLoc / self.__TargetAngle))
+          Movement = Movement*self.__TargetAngle+AdjustedLoc+self.__StepsUp
           WillOverShot = Movement >= self.__TargetAngle
         
         print(f"Servo {self.Name} moving {Movement} to {self.__TargetAngle}")
@@ -132,8 +137,9 @@ class DogCamController:
       
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    self.__Servos = {"pan": DogCamServo("pan", 27, 3.45, 18.0), 
-    "tilt": DogCamServo("tilt", 17, 4.5, 18.0)}
+    self.__Servos = {
+    "pan": DogCamServo("pan", 27, 3.45, 18.0, 1.5, 2.0), 
+    "tilt": DogCamServo("tilt", 17, 4.5, 18.0, 2.15, 4.0)}
     
     print("Controllers are ready")
     
@@ -153,7 +159,7 @@ class DogCamController:
         TheServo.MoveToAbsoluteAngle(AbsoluteAngle)
         TheAngle = AbsoluteAngle
       elif InterpAngle != 0.0:
-        TheServo.MoveToInterpAngle(AbsoluteAngle)
+        TheServo.MoveToInterpAngle(InterpAngle)
         TheAngle = InterpAngle
       else:
         TheAngle = 0.0
