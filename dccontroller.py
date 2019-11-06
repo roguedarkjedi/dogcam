@@ -106,7 +106,7 @@ class DogCamServo:
         else:
           await self.__InterpPosition(Movement)
         
-      await asyncio.sleep(1)
+      await asyncio.sleep(0.1)
     
 
 class DogCamController:
