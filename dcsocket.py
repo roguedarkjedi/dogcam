@@ -47,6 +47,9 @@ async def DCHandler(websocket, path):
     elif ServoAction == "moveabs":
       print(f"Moving {ServoName} absolutely")
       DCCI.MoveServoTo(ServoName, AbsoluteAngle=ServoAngle)
+    elif ServoAction == "moveinterp":
+      print(f"Moving {ServoName} interpretively")
+      DCCI.MoveServoTo(ServoName, InterpAngle=ServoAngle)
     elif ServoAction == "resetall":
       print("All servos going to reset")
       DCCI.ResetAllServos()

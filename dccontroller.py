@@ -54,6 +54,14 @@ class DogCamServo:
     if angle == 0.0:
       self.Reset()
     else:
+      self.__MoveToPosition(angle)
+      self.__CurrentAngle = angle
+      self.__TargetAngle = angle
+      
+  def MoveToInterpAngle(self, angle):
+    if angle == 0.0:
+      self.Reset()
+    else:
       self.__TargetAngle = angle
       print(f"Setting location to {angle}")
   
@@ -122,16 +130,18 @@ class DogCamController:
       
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    self.__Servos = {"pan": DogCamServo("pan", 27, 3.8, 20.0), 
+    self.__Servos = {"pan": DogCamServo("pan", 27, 3.45, 18.0), 
     "tilt": DogCamServo("tilt", 17, 4.5, 18.0)}
     
     print("Controllers are ready")
     
   def __del__(self):
-    self.__Servos = {}    
+    print("Shutting down robot")
+    self.ResetAllServos()
+    self.__Servos = {}  
     GPIO.cleanup()
 
-  def MoveServoTo(self, ServoName:str, RelativeAngle=0.0, AbsoluteAngle=0.0):
+  def MoveServoTo(self, ServoName:str, RelativeAngle=0.0, InterpAngle=0.0, AbsoluteAngle=0.0):
     if ServoName.lower() in self.__Servos:
       TheServo = self.__Servos[ServoName.lower()]
       if RelativeAngle != 0.0:
@@ -140,6 +150,9 @@ class DogCamController:
       elif AbsoluteAngle != 0.0:
         TheServo.MoveToAbsoluteAngle(AbsoluteAngle)
         TheAngle = AbsoluteAngle
+      elif InterpAngle != 0.0:
+        TheServo.MoveToInterpAngle(AbsoluteAngle)
+        TheAngle = InterpAngle
       else:
         TheAngle = 0.0
         TheServo.Reset()
