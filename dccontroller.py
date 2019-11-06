@@ -35,12 +35,6 @@ class DogCamServo:
     
     self.ShouldLoop = True
     asyncio.get_event_loop().create_task(self.__ServoLoop())
-    
-  def __eq__(self, Other):
-    if instanceof(Other, str):
-      return self.Name == Other.lower()
-    else:
-      return super().__eq__(Other)
       
   def __del__(self):
     print(f"{self.Name}: Shutting off hardware")
@@ -147,6 +141,7 @@ class DogCamController:
       
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
+    # InName, GPIOPin, InStart, InPulseBound, InStepsUp, InStepsDown
     self.__Servos = {
     "pan": DogCamServo("pan", 27, 2.2, 18.0, 1.5, 2.0), 
     "tilt": DogCamServo("tilt", 17, 4.5, 18.0, 2.15, 4.0)}
