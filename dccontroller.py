@@ -50,6 +50,9 @@ class DogCamServo:
     self.__MoveToPosition(0)
     print(f"{self.Name}: reset")
     
+  def GetCurrentAngle(self):
+    return self.__CurrentAngle
+    
   def __SetBothAngles(self, angle):
     self.__TargetAngle = angle
     self.__CurrentAngle = angle
@@ -181,9 +184,15 @@ class DogCamController:
       print(f"Servo {ServoName.lower()} does not exist!")
       
   def ResetAllServos(self):
-    for name,servo in self.__Servos:
+    for servo in self.__Servos.values():
       servo.Reset()
 
   def StopServoLoops(self):
-    for name,servo in self.__Servos:
+    for servo in self.__Servos.values():
       servo.ShouldLoop = False
+      
+  def GetCurrentAngle(self, ServoName:str):
+    if ServoName.lower() in self.__Servos:
+      return self.__Servos[ServoName.lower()].GetCurrentAngle()
+    else:
+      return 0.0
