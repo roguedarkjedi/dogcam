@@ -63,7 +63,9 @@ async def DCHandler(websocket, path):
       
     ResponseBlob = {"time": str(datetime.now()),
                     "status": ActionHandled, 
-                    "action": ServoAction}
+                    "action": ServoAction,
+                    "tiltCurrentAngle": DCCI.GetCurrentAngle("tilt"),
+                    "panCurrentAngle": DCCI.GetCurrentAngle("pan")}
     
     print("Sending reply")
     await websocket.send(json.dumps(ResponseBlob))
