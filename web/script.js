@@ -21,6 +21,7 @@ function CreateWebsocket()
 function onOpen(evt)
 {
   writeToScreen("CONNECTED");
+  setInterval(getCurrentAngles, 3000);
 }
 
 function onClose(evt)
@@ -47,6 +48,11 @@ function writeToScreen(message)
   pre.style.wordWrap = "break-word";
   pre.innerHTML = message;
   output.appendChild(pre);
+}
+
+function getCurrentAngles()
+{
+  websocket.send('{"servo": "tilt", "action": "curangles"}');
 }
 
 function moveUp()

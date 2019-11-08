@@ -57,6 +57,8 @@ async def DCHandler(websocket, path):
     elif ServoAction == "resetall":
       print("All servos going to reset")
       DCCI.ResetAllServos()
+    elif ServoAction == "curangles":
+      print("Sending back current angles")
     else:
       print("Message unhandled!")
       ActionHandled = False
