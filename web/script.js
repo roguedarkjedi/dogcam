@@ -23,13 +23,13 @@ function getCurrentAngles()
   websocket.send('{"servo": "tilt", "action": "curangles"}');
 }
 
-function onOpen(evt)
+function onOpen()
 {
   writeToScreen("CONNECTED");
   setInterval(getCurrentAngles, 3000);
 }
 
-function onClose(evt)
+function onClose()
 {
   writeToScreen("DISCONNECTED");
 }
@@ -89,8 +89,8 @@ function CreateWebsocket()
   tiltAngle = document.getElementById("tiltangle");
   
   websocket = new WebSocket("ws://192.168.50.169:5867/");
-  websocket.onopen = function(evt) { onOpen(evt); };
-  websocket.onclose = function(evt) { onClose(evt); };
+  websocket.onopen = function(evt) { onOpen(); };
+  websocket.onclose = function(evt) { onClose(); };
   websocket.onmessage = function(evt) { onMessage(evt); };
   websocket.onerror = function(evt) { onError(evt); };
   console.log("Ready");
