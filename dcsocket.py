@@ -10,6 +10,7 @@ __all__ = ("DogCamWebSocket")
 # This makes a websocket for taking in remote commands
 class DogCamWebSocket():
   WSThread = None
+  WSLoop = None
   
   def __init__(self):
     print("Starting websocket")
@@ -17,10 +18,10 @@ class DogCamWebSocket():
     self.WSThread.start()
   
   def RunServer(self):
-    NewLoop = asyncio.new_event_loop()
-    asyncio.set_event_loop(NewLoop)
-    NewLoop.run_until_complete(websockets.serve(DCHandler, "", 5867))
-    NewLoop.run_forever()
+    self.WSLoop = asyncio.new_event_loop()
+    asyncio.set_event_loop(self.WSLoop)
+    self.WSLoop.run_until_complete(websockets.serve(DCHandler, "", 5867))
+    self.WSLoop.run_forever()
   
 async def DCHandler(websocket, path):
   print("Handling websocket messages")
@@ -33,7 +34,7 @@ async def DCHandler(websocket, path):
       continue
 
     # Require flags in request
-    if not "servo" in jsonData or not "action" in jsonData:
+    if "servo" not in jsonData or "action" not in jsonData:
       continue
     
     DCCI = DogCamController.Instance
