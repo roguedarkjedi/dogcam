@@ -1,21 +1,26 @@
 var output;
 var panAngle;
 var tiltAngle;
+var websocket;
 var TiltAngleOffset=10.0;
 var PanAngleOffset=10.0;
 
-function CreateWebsocket()
+function writeToScreen(message)
 {
-  output = document.getElementById("robotconsole");
-  panAngle = document.getElementById("panangle");
-  tiltAngle = document.getElementById("tiltangle");
+  if (!output)
+  {
+   return; 
+  }
   
-  websocket = new WebSocket("ws://192.168.50.169:5867/");
-  websocket.onopen = function(evt) { onOpen(evt) };
-  websocket.onclose = function(evt) { onClose(evt) };
-  websocket.onmessage = function(evt) { onMessage(evt) };
-  websocket.onerror = function(evt) { onError(evt) };
-  console.log("Ready");
+  var pre = document.createElement("p");
+  pre.style.wordWrap = "break-word";
+  pre.innerHTML = message;
+  output.appendChild(pre);
+}
+
+function getCurrentAngles()
+{
+  websocket.send('{"servo": "tilt", "action": "curangles"}');
 }
 
 function onOpen(evt)
@@ -40,19 +45,6 @@ function onMessage(evt)
 function onError(evt)
 {
   writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-}
-
-function writeToScreen(message)
-{
-  var pre = document.createElement("p");
-  pre.style.wordWrap = "break-word";
-  pre.innerHTML = message;
-  output.appendChild(pre);
-}
-
-function getCurrentAngles()
-{
-  websocket.send('{"servo": "tilt", "action": "curangles"}');
 }
 
 function moveUp()
@@ -88,6 +80,20 @@ function resetTilt()
 function resetAll()
 {
   websocket.send('{"servo": "tilt", "action": "resetall"}');
+}
+
+function CreateWebsocket()
+{
+  output = document.getElementById("robotconsole");
+  panAngle = document.getElementById("panangle");
+  tiltAngle = document.getElementById("tiltangle");
+  
+  websocket = new WebSocket("ws://192.168.50.169:5867/");
+  websocket.onopen = function(evt) { onOpen(evt); };
+  websocket.onclose = function(evt) { onClose(evt); };
+  websocket.onmessage = function(evt) { onMessage(evt); };
+  websocket.onerror = function(evt) { onError(evt); };
+  console.log("Ready");
 }
 
 window.addEventListener("load", CreateWebsocket);
