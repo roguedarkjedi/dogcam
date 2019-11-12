@@ -38,8 +38,8 @@ function onMessage(evt)
 {
   var responseMessage = JSON.parse(evt.data);  
   writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
-  panAngle.innerHTML = responseMessage.panCurrentAngle;
-  tiltAngle.innerHTML = responseMessage.tiltCurrentAngle;
+  panAngle.innerText = responseMessage.panCurrentAngle;
+  tiltAngle.innerText = responseMessage.tiltCurrentAngle;
 }
 
 function onError(evt)
