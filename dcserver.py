@@ -18,5 +18,4 @@ def StartWebserver():
   WebServer = server.ThreadingHTTPServer(("", 8080), DogCamWebServer)
   HttpHandle = threading.Thread(target=WebServer.serve_forever, daemon = True, name="WebServer")
   HttpHandle.start()
-
-StartWebserver()
+  print("Web server started")

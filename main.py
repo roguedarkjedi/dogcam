@@ -6,6 +6,7 @@ import asyncio
 async def main():
   CamControl = DogCamController()
   SocketServer = DogCamWebSocket()
+  dcserver.StartWebserver()
   
   print(f"Camera Controller at {str(CamControl)} and Socket Server at {str(SocketServer)}")
   
