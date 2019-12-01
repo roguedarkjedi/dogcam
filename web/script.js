@@ -88,7 +88,7 @@ function CreateWebsocket()
   panAngle = document.getElementById("panangle");
   tiltAngle = document.getElementById("tiltangle");
   
-  websocket = new WebSocket("ws://192.168.50.169:5867/");
+  websocket = new WebSocket("ws://"+window.location.hostname+":5867/");
   websocket.onopen = function(evt) { onOpen(); };
   websocket.onclose = function(evt) { onClose(); };
   websocket.onmessage = function(evt) { onMessage(evt); };
