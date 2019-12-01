@@ -26,7 +26,7 @@ function getCurrentAngles()
 function onOpen()
 {
   writeToScreen("CONNECTED");
-  setInterval(getCurrentAngles, 3000);
+  setInterval(getCurrentAngles, 15000);
 }
 
 function onClose()
