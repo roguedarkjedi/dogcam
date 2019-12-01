@@ -1,5 +1,6 @@
 from dccontroller import DogCamController
 from dcsocket import DogCamWebSocket
+import dcserver
 import asyncio
 
 async def main():
