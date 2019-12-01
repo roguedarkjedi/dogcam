@@ -127,7 +127,11 @@ class DogCamServo:
           await self.__InterpPosition(Movement)
 
         continue
-        
+      """
+      else:
+        self.__MoveToPosition(self.__CurrentAngle)
+        await asyncio.sleep(0.4)
+      """
       await asyncio.sleep(0.1)
     
 
@@ -146,8 +150,8 @@ class DogCamController:
     GPIO.setwarnings(False)
     # InName, GPIOPin, InStart, InPulseBound, InStepsUp, InStepsDown
     self.__Servos = {
-    "pan": DogCamServo("pan", 27, 2.2, 18.0, 1.5, 2.0), 
-    "tilt": DogCamServo("tilt", 17, 4.5, 18.0, 2.15, 4.0)}
+    "pan": DogCamServo("pan", 27, 3.0, 18.0, 1.2, 1.2), 
+    "tilt": DogCamServo("tilt", 17, 2.2, 18.0, 1.3, 1.3)}
     
     print("Controllers are ready")
     
