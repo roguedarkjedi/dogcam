@@ -105,3 +105,4 @@ venv.bak/
 
 project.geany
 test.py
+parts/
