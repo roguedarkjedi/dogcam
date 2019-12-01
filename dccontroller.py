@@ -14,9 +14,12 @@ class DogCamServo:
   __Pulse=0.0
   __ServoDelta=0.0
   __ZeroAngle=0
+  __Steps=0.0
+  __LowerBounds=0.0
+  __UpperBounds=180.0
   __Hardware=None
   
-  def __init__(self, InName, GPIOPin, InStart, InPulseBound, ZeroAngle=0):
+  def __init__(self, InName, GPIOPin, InStart, InPulseBound, ZeroAngle=0, Steps=5.0, LowerBounds=0.0, UpperBounds=180.0):
     self.Name = InName.lower()
     self.Pin = GPIOPin
     self.__Start = InStart
@@ -25,6 +28,9 @@ class DogCamServo:
     self.__Hardware = GPIO.PWM(GPIOPin, 50)
     self.__Hardware.start(self.__Start)
     self.__ZeroAngle = ZeroAngle
+    self.__Steps=Steps
+    self.__LowerBounds = LowerBounds
+    self.__UpperBounds = UpperBounds
 
     self.Reset()
     
@@ -55,14 +61,14 @@ class DogCamServo:
     self.__CurrentAngle = angle
     
   def __SetTargetAngle(self, angle):
-    if angle < 0.0:
-      angle = 0.0
-    elif angle > 180.0:
-      angle = 180.0
+    if angle < self.__LowerBounds:
+      angle = self.__LowerBounds
+    elif angle > self.__UpperBounds:
+      angle = self.__UpperBounds
       
     self.__TargetAngle = angle
     
-    self.__ServoDelta = abs(self.__CurrentAngle - angle) / 5.0
+    self.__ServoDelta = abs(self.__CurrentAngle - angle) / self.__Steps
 
   def MoveToAbsoluteAngle(self, angle):
     if angle == 0.0:
@@ -116,7 +122,7 @@ class DogCamServo:
         
         print(f"{self.Name}: moving {Movement} to {self.__TargetAngle}")
         
-        if WillOverShot or self.__TargetAngle < 0.0 or self.__TargetAngle > 180.0:
+        if WillOverShot or self.__TargetAngle < self.__LowerBounds or self.__TargetAngle > self.__UpperBounds:
           print(f"{self.Name}: We there")
           self.__ServoDelta = 0.0
           self.__MoveToPosition(self.__TargetAngle)
@@ -125,12 +131,8 @@ class DogCamServo:
           await self.__InterpPosition(Movement)
 
         continue
-      """
-      else:
-        self.__MoveToPosition(self.__CurrentAngle)
-        await asyncio.sleep(0.4)
-      """
-      await asyncio.sleep(0.1)
+
+      await asyncio.sleep(0.4)
     
 
 class DogCamController:
@@ -146,10 +148,10 @@ class DogCamController:
       
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    # InName, GPIOPin, InStart, InPulseBound, InStepsUp, InStepsDown
+    # InName, GPIOPin, InStart, InPulseBound
     self.__Servos = {
-    "pan": DogCamServo("pan", 27, 3.0, 18.0, ZeroAngle=4), 
-    "tilt": DogCamServo("tilt", 17, 2.2, 18.0)}
+    "pan": DogCamServo("pan", 27, 3.0, 18.0, ZeroAngle=4, Steps=2.0, LowerBounds=4), 
+    "tilt": DogCamServo("tilt", 17, 2.2, 18.0, Steps=3.0, LowerBounds=-25, UpperBounds=55)}
     
     print("Controllers are ready")
     
