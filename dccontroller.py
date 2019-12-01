@@ -1,7 +1,6 @@
 import RPi.GPIO as GPIO
 import asyncio
 import time
-import pytweening
 
 __all__ = ("DogCamController")
 
@@ -11,24 +10,22 @@ class DogCamServo:
   ShouldLoop=False
   __CurrentAngle=0.0
   __TargetAngle=0.0
-  # Servos have odd stepping differences, adjust here
-  __StepsUp=0.0
-  __StepsDown=0.0
   __Start=0.0
   __Pulse=0.0
+  __ServoDelta=0.0
+  __ZeroAngle=0
   __Hardware=None
   
-  def __init__(self, InName, GPIOPin, InStart, InPulseBound, InStepsUp, InStepsDown):
+  def __init__(self, InName, GPIOPin, InStart, InPulseBound, ZeroAngle=0):
     self.Name = InName.lower()
     self.Pin = GPIOPin
     self.__Start = InStart
     self.__Pulse = InPulseBound
     GPIO.setup(GPIOPin, GPIO.OUT)
-    self.__StepsUp = InStepsUp
-    self.__StepsDown = InStepsDown
     self.__Hardware = GPIO.PWM(GPIOPin, 50)
     self.__Hardware.start(self.__Start)
-    
+    self.__ZeroAngle = ZeroAngle
+
     self.Reset()
     
     print(f"{self.Name}: ready for motion")
@@ -43,11 +40,11 @@ class DogCamServo:
     self.__Hardware.stop()
     
   def Reset(self):
-    self.__SetBothAngles(0)
+    self.__SetBothAngles(self.__ZeroAngle)
     
-    self.__MoveToPosition(0)
+    self.__MoveToPosition(self.__ZeroAngle)
     time.sleep(1)
-    self.__MoveToPosition(0)
+    self.__MoveToPosition(self.__ZeroAngle)
     print(f"{self.Name}: reset")
     
   def GetCurrentAngle(self):
@@ -62,8 +59,10 @@ class DogCamServo:
       angle = 0.0
     elif angle > 180.0:
       angle = 180.0
-    
+      
     self.__TargetAngle = angle
+    
+    self.__ServoDelta = abs(self.__CurrentAngle - angle) / 5.0
 
   def MoveToAbsoluteAngle(self, angle):
     if angle == 0.0:
@@ -109,18 +108,17 @@ class DogCamServo:
           
         # Determine where we should go
         if self.__CurrentAngle > self.__TargetAngle:
-          Movement = pytweening.easeInQuad(abs(self.__TargetAngle / AdjustedLoc))
-          Movement = Movement*-self.__TargetAngle+AdjustedLoc-self.__StepsDown
+          Movement = self.__CurrentAngle - self.__ServoDelta
           WillOverShot = Movement <= self.__TargetAngle
         else:
-          Movement = pytweening.easeInQuad(abs(AdjustedLoc / self.__TargetAngle))
-          Movement = Movement*self.__TargetAngle+AdjustedLoc+self.__StepsUp
+          Movement = self.__CurrentAngle + self.__ServoDelta
           WillOverShot = Movement >= self.__TargetAngle
         
         print(f"{self.Name}: moving {Movement} to {self.__TargetAngle}")
         
         if WillOverShot or self.__TargetAngle < 0.0 or self.__TargetAngle > 180.0:
           print(f"{self.Name}: We there")
+          self.__ServoDelta = 0.0
           self.__MoveToPosition(self.__TargetAngle)
           self.__SetBothAngles(self.__TargetAngle)
         else:
@@ -150,8 +148,8 @@ class DogCamController:
     GPIO.setwarnings(False)
     # InName, GPIOPin, InStart, InPulseBound, InStepsUp, InStepsDown
     self.__Servos = {
-    "pan": DogCamServo("pan", 27, 3.0, 18.0, 1.2, 1.2), 
-    "tilt": DogCamServo("tilt", 17, 2.2, 18.0, 1.3, 1.3)}
+    "pan": DogCamServo("pan", 27, 3.0, 18.0, ZeroAngle=4), 
+    "tilt": DogCamServo("tilt", 17, 2.2, 18.0)}
     
     print("Controllers are ready")
     
