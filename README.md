@@ -2,6 +2,8 @@
 
 The controller software used for the current dog cam that powers the stream.
 
+## Robotics
+
 Also includes the 3D model files used for this project. These have been modified for compatibility and modularity between the various parts used. 
 
 This [project by apetrone](https://www.thingiverse.com/thing:242438): 
