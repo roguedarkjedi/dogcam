@@ -6,10 +6,6 @@ This [project by apetrone](https://www.thingiverse.com/thing:242438):
 * lift_arm_holed.stl
 * base.stl
 
-This [project by Hjorvarth](https://www.thingiverse.com/thing:100241):
-
-* clamp.stl
-
 This [project from metaform3d](https://www.thingiverse.com/thing:207404):
 
 * servo_head.stl
@@ -17,5 +13,6 @@ This [project from metaform3d](https://www.thingiverse.com/thing:207404):
 This [project from Vicharian](https://www.thingiverse.com/thing:3317345):
 
 * phone_mount_bar.stl
+* clamp.stl
 
 These above parts are licensed under the [Creative Commons - Attribution - Share Alike license](https://creativecommons.org/licenses/by-sa/3.0/) and are under different terms than the code provided.
