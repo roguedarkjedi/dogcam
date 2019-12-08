@@ -1,4 +1,4 @@
-the 3D model files used for this project. These have been modified for compatibility and modularity between the various parts used. 
+This is the 3D model files used for this project. These have been modified for compatibility and modularity between the various parts used. 
 
 This [project by apetrone](https://www.thingiverse.com/thing:242438): 
 
