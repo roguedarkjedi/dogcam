@@ -5,6 +5,10 @@ var websocket;
 var TiltAngleOffset=10.0;
 var PanAngleOffset=10.0;
 
+/*
+A lot of code is shamelessly copied from https://www.websocket.org/echo.html and is pretty awful.
+*/
+
 function writeToScreen(message)
 {
   if (!output)
