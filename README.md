@@ -4,7 +4,7 @@ The controller software used for the current dog cam that powers the stream.
 
 ## How to use
 
-Once physically built and installed, run main.py. The servo web interface is accessible on the Pi's IP address on port 8080. This repro contains only the basic drivers and movement controllers, and does not do automatic tracking. With additional work, automatic following is possible.
+Once physically built and installed, run main.py. The servo web interface is accessible on the Pi's IP address on port 8080. This repro contains only the basic drivers and movement controllers, and does not do computer vision. With additional work, automatic tracking is possible.
 
 ## Robotics
 
