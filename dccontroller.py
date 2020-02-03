@@ -150,8 +150,8 @@ class DogCamController:
     # InName, GPIOPin, InStart, InPulseBound
     # Probably should config this at some point.
     self.__Servos = {
-    "pan": DogCamServo("pan", 27, 3.0, 18.0, ZeroAngle=4, Steps=4.0, LowerBounds=4, UpperBounds=155), 
-    "tilt": DogCamServo("tilt", 17, 2.2, 18.0, Steps=3.0, LowerBounds=-25, UpperBounds=55)}
+    "pan": DogCamServo("pan", 17, 3.0, 18.0, ZeroAngle=4, Steps=4.0, LowerBounds=4, UpperBounds=155), 
+    "tilt": DogCamServo("tilt", 27, 2.2, 18.0, Steps=3.0, LowerBounds=-25, UpperBounds=55)}
     
     print("Controllers are ready")
     
