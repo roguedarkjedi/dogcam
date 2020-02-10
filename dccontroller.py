@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import asyncio
 import time
+import json
 
 __all__ = ("DogCamController")
 
@@ -19,7 +20,7 @@ class DogCamServo:
   __UpperBounds=180.0
   __Hardware=None
   
-  def __init__(self, InName, GPIOPin, InStart, InPulseBound, ZeroAngle=0, Steps=5.0, LowerBounds=0.0, UpperBounds=180.0):
+  def __init__(self, InName, GPIOPin, InStart, InPulseBound, ZeroAngle=0, Steps=0.0, LowerBounds=0.0, UpperBounds=0.0):
     self.Name = InName.lower()
     self.Pin = GPIOPin
     self.__Start = InStart
@@ -147,13 +148,8 @@ class DogCamController:
       
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    # InName, GPIOPin, InStart, InPulseBound
-    # Probably should config this at some point.
-    self.__Servos = {
-    "pan": DogCamServo("pan", 17, 3.0, 18.0, ZeroAngle=4, Steps=4.0, LowerBounds=4, UpperBounds=155), 
-    "tilt": DogCamServo("tilt", 27, 2.2, 18.0, Steps=3.0, LowerBounds=-25, UpperBounds=55)}
-    
-    print("Controllers are ready")
+    self.__ReadConfig()
+    print("DogCam Ready")
     
   def __del__(self):
     print("Shutting down robot")
@@ -161,6 +157,36 @@ class DogCamController:
     self.StopServoLoops()
     self.__Servos = {}  
     GPIO.cleanup()
+
+  def __ReadConfig(self):
+    with open("./config.json","r") as cfg_file:
+      ConfigBlob = json.load(cfg_file)
+
+      for item in ConfigBlob["Servos"]:
+        if not "name" in item or not "pin" in item or not "start" in item:
+          raise KeyError("Missing required configuration!")
+
+        Name = item["name"]
+        ZeroLoc = 0.0
+        Step = ConfigBlob["DefaultStep"]
+        LowBound = 0.0
+        HighBound = ConfigBlob["DefaultHigh"]
+
+        if "zero" in item:
+          ZeroLoc = item["zero"]
+        if "step" in item:
+          Step = item["step"]
+        if "low" in item:
+          LowBound = item["low"]
+        if "high" in item:
+          HighBound = item["high"]
+
+        self.__Servos[Name] = DogCamServo(Name, item["pin"], item["start"], 
+          item["pulse"], ZeroAngle=ZeroLoc, Steps=Step, LowerBounds=LowBound,
+          UpperBounds=HighBound)
+        print(f"Imported servo: {Name}")
+
+      print("Config imported!")
 
   def MoveServoTo(self, ServoName:str, RelativeAngle=0.0, InterpAngle=0.0, AbsoluteAngle=0.0):
     if ServoName.lower() in self.__Servos:

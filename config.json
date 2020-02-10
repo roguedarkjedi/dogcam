@@ -1,0 +1,26 @@
+{
+  "DefaultHigh": 180,
+  "DefaultStep": 5.0,
+  "Servos": 
+  [
+	{
+	"name": "pan",
+	"pin": 17,
+	"start": 3.0,
+	"pulse": 18.0,
+	"zero": 4,
+	"step": 4.0,
+	"low": 4,
+	"high": 155
+	}, 
+	{
+	"name": "tilt",
+	"pin": 27,
+	"start": 2.2,
+	"pulse": 18.0,
+	"step": 3.0,
+	"low": -25,
+	"high": 55
+	}
+  ]
+}
