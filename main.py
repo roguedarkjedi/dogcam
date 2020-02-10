@@ -8,7 +8,7 @@ async def main():
   SocketServer = DogCamWebSocket()
   dcserver.StartWebserver()
   
-  print(f"Camera Controller at {str(CamControl)} and Socket Server at {str(SocketServer)}")
+  print(f"Camera Controller at {str(CamControl)} and\nSocket Server at {str(SocketServer)}")
   
   while True:
     try:
