@@ -2,8 +2,6 @@ var output;
 var panAngle;
 var tiltAngle;
 var websocket;
-var TiltAngleOffset=10.0;
-var PanAngleOffset=10.0;
 
 /*
 A lot of code is shamelessly copied from https://www.websocket.org/echo.html and is pretty awful.
@@ -53,22 +51,22 @@ function onError(evt)
 
 function moveUp()
 {
-  websocket.send('{"servo": "tilt", "action": "moverel", "angle": '+TiltAngleOffset+'}');
+  websocket.send('{"action": "up"}');
 }
 
 function moveDown()
 {
-  websocket.send('{"servo": "tilt", "action": "moverel", "angle": -'+TiltAngleOffset+'}');
+  websocket.send('{"action": "down"}');
 }
 
 function moveLeft()
 {
-  websocket.send('{"servo": "pan", "action": "moverel", "angle": -'+PanAngleOffset+'}');
+  websocket.send('{"action": "left"}');
 }
 
 function moveRight()
 {
-  websocket.send('{"servo": "pan", "action": "moverel", "angle": '+PanAngleOffset+'}');
+  websocket.send('{"action": "right"}');
 }
 
 function resetPan()

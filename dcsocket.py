@@ -34,15 +34,27 @@ async def DCHandler(websocket, path):
       continue
 
     # Require flags in request
-    if "servo" not in jsonData or "action" not in jsonData:
+    if "action" not in jsonData:
       continue
     
     DCCI = DogCamController.Instance
-    ServoName = jsonData["servo"].lower()
+    if "servo" not in jsonData:
+      ServoName = "none"
+    else:
+      ServoName = jsonData["servo"].lower()
+    
     ServoAction = jsonData["action"].lower()
     ServoAngle = jsonData.get("angle")
     ActionHandled = True
     
+    if ServoAction == "left":
+      DCCI.MoveServoLeft()
+    elif ServoAction == "right":
+      DCCI.MoveServoRight()
+    elif ServoAction == "up" or ServoAction == "top":
+      DCCI.MoveServoUp()
+    elif ServoAction == "down" or ServoAction == "bottom":
+      DCCI.MoveServoDown()
     if ServoAction == "reset":
       print("Handling reset command")
       DCCI.ResetServo(ServoName)

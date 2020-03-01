@@ -137,6 +137,7 @@ class DogCamServo:
 
 class DogCamController:
   __Servos = {}
+  __RelAngle = 0.0
   Instance = None
   
   def __init__(self):
@@ -161,7 +162,8 @@ class DogCamController:
   def __ReadConfig(self):
     with open("./config.json","r") as cfg_file:
       ConfigBlob = json.load(cfg_file)
-
+      
+      self.__RelAngle = ConfigBlob["DefaultRelativeAngle"]
       for item in ConfigBlob["Servos"]:
         if not "name" in item or not "pin" in item or not "start" in item:
           raise KeyError("Missing required configuration!")
@@ -206,7 +208,16 @@ class DogCamController:
       print(f"Moving {ServoName} to {TheAngle}")
     else:
       print(f"Servo {ServoName.lower()} is not a valid servo!")
-      
+  
+  def MoveServoLeft(self):
+    self.MoveServoTo("pan", RelativeAngle=-self.__RelAngle)
+  def MoveServoRight(self):
+    self.MoveServoTo("pan", RelativeAngle=self.__RelAngle)
+  def MoveServoUp(self):
+    self.MoveServoTo("tilt", RelativeAngle=-self.__RelAngle)
+  def MoveServoDown(self):
+    self.MoveServoTo("tilt", RelativeAngle=self.__RelAngle)
+    
   def ResetServo(self, ServoName:str):
     if ServoName.lower() in self.__Servos:
       self.__Servos[ServoName.lower()].Reset()

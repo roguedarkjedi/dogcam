@@ -1,6 +1,7 @@
 {
   "DefaultHigh": 180,
   "DefaultStep": 5.0,
+  "DefaultRelativeAngle": 10.0,
   "Servos": 
   [
 	{
