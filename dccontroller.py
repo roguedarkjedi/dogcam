@@ -138,6 +138,7 @@ class DogCamServo:
 class DogCamController:
   __Servos = {}
   __RelAngle = 0.0
+  AIDisabled = False
   Instance = None
   
   def __init__(self):
