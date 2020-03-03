@@ -30,7 +30,7 @@ async def DCHandler(websocket, path):
     try:
       jsonData = json.loads(RawData)
     except Exception as ex:
-      print(f"Encountered Exception in WebSock: {str(ex)}")
+      print(f"Encountered Exception in WebSock: {str(ex)}\nWith Raw Data {RawData}")
       continue
 
     # Require flags in request
