@@ -43,11 +43,18 @@ async def DCHandler(websocket, path):
     else:
       ServoName = jsonData["servo"].lower()
     
+    ActionSource = jsonData.get("source")
     ServoAction = jsonData["action"].lower()
     ServoAngle = jsonData.get("angle")
     ActionHandled = True
     
-    if ServoAction == "left":
+    if ActionSource == "dogcamai" and DCCI.AIDisabled is True:
+      ActionHandled = False
+    elif ServoAction == "disableai":
+      DCCI.AIDisabled = True
+    elif ServoAction == "enableai":
+      DCCI.AIDisabled = False
+    elif ServoAction == "left":
       DCCI.MoveServoLeft()
     elif ServoAction == "right":
       DCCI.MoveServoRight()
@@ -79,6 +86,7 @@ async def DCHandler(websocket, path):
     ResponseBlob = {"time": str(datetime.now()),
                     "status": ActionHandled, 
                     "action": ServoAction,
+                    "AIDisabled": DCCI.AIDisabled,
                     "tiltCurrentAngle": DCCI.GetCurrentAngle("tilt"),
                     "panCurrentAngle": DCCI.GetCurrentAngle("pan")}
     
