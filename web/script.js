@@ -91,7 +91,7 @@ function resetAll()
 function toggleAI()
 {
   var aiCommand = (aiStatus) ? "enableai" : "disableai";
-  websocket.send('{"action": '+aiCommand+'}');
+  websocket.send('{"action": "'+aiCommand+'"}');
   aiStatus = !aiStatus;
 }
 
