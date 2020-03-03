@@ -1,7 +1,9 @@
 var output;
 var panAngle;
 var tiltAngle;
+var aiStatusText;
 var websocket;
+var aiStatus=false;
 
 /*
 A lot of code is shamelessly copied from https://www.websocket.org/echo.html and is pretty awful.
@@ -42,6 +44,8 @@ function onMessage(evt)
   writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
   panAngle.innerText = responseMessage.panCurrentAngle;
   tiltAngle.innerText = responseMessage.tiltCurrentAngle;
+  aiStatusText.innerText = responseMessage.AIDisabled;
+  aiStatus = responseMessage.AIDisabled;
 }
 
 function onError(evt)
@@ -84,11 +88,19 @@ function resetAll()
   websocket.send('{"servo": "tilt", "action": "resetall"}');
 }
 
+function toggleAI()
+{
+  var aiCommand = (aiStatus) ? "enableai" : "disableai";
+  websocket.send('{"action": '+aiCommand+'}');
+  aiStatus = !aiStatus;
+}
+
 function CreateWebsocket()
 {
   output = document.getElementById("robotconsole");
   panAngle = document.getElementById("panangle");
   tiltAngle = document.getElementById("tiltangle");
+  aiStatusText = document.getElementById("aistatus");
   
   websocket = new WebSocket("ws://"+window.location.hostname+":5867/");
   websocket.onopen = function(evt) { onOpen(); };
