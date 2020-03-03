@@ -62,7 +62,7 @@ async def DCHandler(websocket, path):
       DCCI.MoveServoUp()
     elif ServoAction == "down" or ServoAction == "bottom":
       DCCI.MoveServoDown()
-    if ServoAction == "reset":
+    elif ServoAction == "reset":
       print("Handling reset command")
       DCCI.ResetServo(ServoName)
     elif ServoAction == "moverel":
