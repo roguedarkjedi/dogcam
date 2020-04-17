@@ -1,9 +1,11 @@
-from dcservo import DogCamServo
+from dcservoraw import DogCamServoRaw
+from dcservoada import DogCamServoAda
 import json
 
 class DogCamController():
   __Servos = {}
-  __RelAngle = 0.0
+  __RelPanAngle = 0.0
+  __RelTiltAngle = 0.0
   AIDisabled = False
   Instance = None
   
@@ -13,8 +15,7 @@ class DogCamController():
     else:
       self = DogCamController.Instance
       return
-      
-    DogCamServo.InitGPIO()
+    
     self.__ReadConfig()
     print("DogCam Ready")
     
@@ -22,23 +23,36 @@ class DogCamController():
     print("Shutting down robot")
     self.ResetAllServos()
     self.StopServoLoops()
-    self.__Servos = {}  
-    DogCamServo.CleanupGPIO()
+    self.__Servos = {}
+    
+    if self.IsUsingGPIO is True:
+      DogCamServoRaw.CleanupGPIO()
 
   def __ReadConfig(self):
+    self.IsUsingGPIO = False
+    
     with open("./config.json","r") as cfg_file:
       ConfigBlob = json.load(cfg_file)
       
-      self.__RelAngle = ConfigBlob["DefaultRelativeAngle"]
+      # Default Angles
+      if "DefaultRelativeAngle" in ConfigBlob:
+        self.__RelPanAngle = self.__RelTiltAngle = ConfigBlob["DefaultRelativeAngle"]
+      else:
+        self.__RelTiltAngle = ConfigBlob["DefaultRelativeTiltAngle"]
+        self.__RelPanAngle = ConfigBlob["DefaultRelativePanAngle"]
+      
       for item in ConfigBlob["Servos"]:
         if not "name" in item or not "pin" in item or not "start" in item:
           raise KeyError("Missing required configuration!")
 
         Name = item["name"]
+        Type = item["type"]
         ZeroLoc = 0.0
         Step = ConfigBlob["DefaultStep"]
         LowBound = 0.0
         HighBound = ConfigBlob["DefaultHigh"]
+        PulseMin = 1000
+        PulseMax = 2000
 
         if "zero" in item:
           ZeroLoc = item["zero"]
@@ -48,10 +62,29 @@ class DogCamController():
           LowBound = item["low"]
         if "high" in item:
           HighBound = item["high"]
+          
+        if "pulsemin" in item:
+          PulseMin = item["pulsemin"]
+          
+        if "pulsemax" in item:
+          PulseMax = item["pulsemax"]
+        
+        NewServo = None
+        
+        if Type.lower() == "ada":
+          NewServo = DogCamServoAda(Name, item["pin"], ZeroAngle=ZeroLoc, 
+          Steps=Step, LowerBounds=LowBound, UpperBounds=HighBound, PulseWidthMin=PulseMin, 
+          PulseWidthMax=PulseMax)
+        else:
+          # Initialize GPIO
+          if self.IsUsingGPIO is False:
+            DogCamServoRaw.InitGPIO()
+            self.IsUsingGPIO = True
+          
+          NewServo = DogCamServoRaw(Name, item["pin"], item["start"], item["pulse"], 
+          ZeroAngle=ZeroLoc, Steps=Step, LowerBounds=LowBound, UpperBounds=HighBound)
 
-        self.__Servos[Name] = DogCamServo(Name, item["pin"], item["start"], 
-          item["pulse"], ZeroAngle=ZeroLoc, Steps=Step, LowerBounds=LowBound,
-          UpperBounds=HighBound)
+        self.__Servos[Name] = NewServo
         print(f"Imported servo: {Name}")
 
       print("Config imported!")
@@ -76,13 +109,13 @@ class DogCamController():
       print(f"Servo {ServoName.lower()} is not a valid servo!")
   
   def MoveServoLeft(self):
-    self.MoveServoTo("pan", RelativeAngle=-self.__RelAngle)
+    self.MoveServoTo("pan", RelativeAngle=-self.__RelPanAngle)
   def MoveServoRight(self):
-    self.MoveServoTo("pan", RelativeAngle=self.__RelAngle)
+    self.MoveServoTo("pan", RelativeAngle=self.__RelPanAngle)
   def MoveServoUp(self):
-    self.MoveServoTo("tilt", RelativeAngle=-self.__RelAngle)
+    self.MoveServoTo("tilt", RelativeAngle=-self.__RelTiltAngle)
   def MoveServoDown(self):
-    self.MoveServoTo("tilt", RelativeAngle=self.__RelAngle)
+    self.MoveServoTo("tilt", RelativeAngle=self.__RelTiltAngle)
     
   def ResetServo(self, ServoName:str):
     if ServoName.lower() in self.__Servos:

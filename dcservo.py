@@ -1,142 +1,113 @@
-import RPi.GPIO as GPIO
 import asyncio
 import time
 
-class DogCamServo():
+class DogCamServoBase():
   Name=""
   Pin=0
-  ShouldLoop=False
-  __CurrentAngle=0.0
-  __TargetAngle=0.0
-  __Start=0.0
-  __Pulse=0.0
-  __ServoDelta=0.0
-  __ZeroAngle=0
-  __Steps=0.0
-  __LowerBounds=0.0
-  __UpperBounds=180.0
-  __Hardware=None
   
-  def __init__(self, InName, GPIOPin, InStart, InPulseBound, ZeroAngle=0, Steps=0.0, LowerBounds=0.0, UpperBounds=0.0):
+  def __init__(self, InName, InPin, InZeroAngle=0.0, InLowerBounds=0.0, InUpperBounds=180.0, InSteps=1.0):
     self.Name = InName.lower()
-    self.Pin = GPIOPin
-    self.__Start = InStart
-    self.__Pulse = InPulseBound
-    GPIO.setup(GPIOPin, GPIO.OUT)
-    self.__Hardware = GPIO.PWM(GPIOPin, 50)
-    self.__Hardware.start(self.__Start)
-    self.__ZeroAngle = ZeroAngle
-    self.__Steps=Steps
-    self.__LowerBounds = LowerBounds
-    self.__UpperBounds = UpperBounds
-
+    self.Pin = InPin
+    
+    self._CurrentAngle = 0.0
+    self._TargetAngle = 0.0
+    self._ServoDelta = 0.0
+    self._Steps = InSteps
+    self._LowerBounds = InLowerBounds
+    self._UpperBounds = InUpperBounds
+    
+    # The angle that we should set to when resetting
+    self._ZeroAngle = InZeroAngle
+    
     self.Reset()
+    
+    # Servo main loop
+    self.ShouldLoop = True
+    asyncio.get_event_loop().create_task(self.__ServoLoop())
     
     print(f"{self.Name}: ready for motion")
     
-    self.ShouldLoop = True
-    asyncio.get_event_loop().create_task(self.__ServoLoop())
-      
   def __del__(self):
     print(f"{self.Name}: Shutting off hardware")
     self.ShouldLoop = False
     self.Reset()
-    self.__Hardware.stop()
-    
-  @staticmethod
-  def InitGPIO():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(False)
-    
-  @staticmethod
-  def CleanupGPIO():
-    GPIO.cleanup()
-    
-  def Reset(self):
-    self.__SetBothAngles(self.__ZeroAngle)
-    
-    self.__MoveToPosition(self.__ZeroAngle)
-    time.sleep(1)
-    self.__MoveToPosition(self.__ZeroAngle)
-    print(f"{self.Name}: reset")
-    
-  def GetCurrentAngle(self):
-    return self.__CurrentAngle
-    
-  def __SetBothAngles(self, angle):
-    self.__TargetAngle = angle
-    self.__CurrentAngle = angle
-    
-  def __SetTargetAngle(self, angle):
-    if angle < self.__LowerBounds:
-      angle = self.__LowerBounds
-    elif angle > self.__UpperBounds:
-      angle = self.__UpperBounds
+  
+  # Must be overridden
+  def _MoveToPosition(self, angle):
+    print(f"{self.Name}: Unhandled Movement command!")
+  
+  
+  def _SetTargetAngle(self, angle):
+    if angle < self._LowerBounds:
+      angle = self._LowerBounds
+    elif angle > self._UpperBounds:
+      angle = self._UpperBounds
       
-    self.__TargetAngle = angle
+    self._TargetAngle = angle
+    self._ServoDelta = abs(self._CurrentAngle - angle) / self._Steps
     
-    self.__ServoDelta = abs(self.__CurrentAngle - angle) / self.__Steps
+  def MoveToRelativeAngle(self, angle):
+    self._SetTargetAngle(self._CurrentAngle + angle)
+    print(f"{self.Name}: Setting relative location to {self._CurrentAngle + angle}")
 
   def MoveToAbsoluteAngle(self, angle):
-    if angle == self.__ZeroAngle:
+    if angle == self._ZeroAngle:
       self.Reset()
     else:
-      self.__MoveToPosition(angle)
-      self.__SetBothAngles(angle)
-      
+      self._MoveToPosition(angle)
+      self._TargetAngle = self._CurrentAngle = angle
+      print(f"{self.Name}: Moving to {angle}")
+    
   def MoveToInterpAngle(self, angle):
-    if angle == self.__ZeroAngle:
+    if angle == self._ZeroAngle:
       self.Reset()
     else:
-      self.__SetTargetAngle(angle)
-      print(f"{self.Name}: Moving location to {angle}")
-  
-  def MoveToRelativeAngle(self, angle):
-    self.__SetTargetAngle(self.__CurrentAngle + angle)
-    print(f"{self.Name}: Setting relative location to {self.__TargetAngle}")
+      self._SetTargetAngle(angle)
+
+    print(f"{self.Name}: Moving location to {angle}")
+    
+  def GetCurrentAngle(self):
+    return self._CurrentAngle
+    
+  def Reset(self):
+    self._TargetAngle = self._CurrentAngle = self._ZeroAngle
+    
+    self._MoveToPosition(self._ZeroAngle)
+    time.sleep(1)
+    self._MoveToPosition(self._ZeroAngle)
+    
+    print(f"{self.Name}: reset")
     
   async def __InterpPosition(self, angle):
-    self.__CurrentAngle = angle
-    self.__MoveToPosition(self.__CurrentAngle)
-  
-  # Moves to exact position, sets no values
-  def __MoveToPosition(self, angle):
-    print(f"{self.Name}: Moving to position {angle}")
-    dutyCycle = angle / self.__Pulse + self.__Start
-    self.__Hardware.ChangeDutyCycle(dutyCycle)
-    
-    # Give hardware time to move
-    time.sleep(0.2)
-    
-    # Do not repeat the duty cycle commands, flush them
-    self.__Hardware.ChangeDutyCycle(0)
-    
+    self._CurrentAngle = angle
+    self._MoveToPosition(self._CurrentAngle)
+
   async def __ServoLoop(self):
     while self.ShouldLoop is True:
       # We need to move
-      if self.__TargetAngle != self.__CurrentAngle:
-        AdjustedLoc = self.__CurrentAngle
+      if self._TargetAngle != self._CurrentAngle:
+        AdjustedLoc = self._CurrentAngle
         if AdjustedLoc == 0.0:
           AdjustedLoc = 1.0
           
         # Determine where we should go
-        if self.__CurrentAngle > self.__TargetAngle:
-          Movement = self.__CurrentAngle - self.__ServoDelta
-          WillOverShot = Movement <= self.__TargetAngle
+        if self._CurrentAngle > self._TargetAngle:
+          Movement = self._CurrentAngle - self._ServoDelta
+          WillOverShot = Movement <= self._TargetAngle
         else:
-          Movement = self.__CurrentAngle + self.__ServoDelta
-          WillOverShot = Movement >= self.__TargetAngle
+          Movement = self._CurrentAngle + self._ServoDelta
+          WillOverShot = Movement >= self._TargetAngle
         
-        print(f"{self.Name}: moving {Movement} to {self.__TargetAngle}")
+        print(f"{self.Name}: moving {Movement} to {self._TargetAngle}")
         
-        if WillOverShot or self.__TargetAngle < self.__LowerBounds or self.__TargetAngle > self.__UpperBounds:
+        if WillOverShot or self._TargetAngle < self._LowerBounds or self._TargetAngle > self._UpperBounds:
           print(f"{self.Name}: We there")
-          self.__ServoDelta = 0.0
-          self.__MoveToPosition(self.__TargetAngle)
-          self.__SetBothAngles(self.__TargetAngle)
+          self._ServoDelta = 0.0
+          self._MoveToPosition(self._TargetAngle)
+          self._TargetAngle = self._CurrentAngle = self._TargetAngle
         else:
           await self.__InterpPosition(Movement)
 
         continue
 
-      await asyncio.sleep(0.4)
+      await asyncio.sleep(0.2)
