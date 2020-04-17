@@ -25,6 +25,7 @@
 	"step": 3.0,
 	"low": -25,
 	"high": 55,
+	"zero": 6,
 	"pulsemin": 18.11,
 	"pulsemax": 1521.2
    }]
