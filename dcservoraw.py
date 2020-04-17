@@ -39,5 +39,3 @@ class DogCamServoRaw(DogCamServoBase):
     
     # Do not repeat the duty cycle commands, flush them
     self.__Hardware.ChangeDutyCycle(0)
-    
-
