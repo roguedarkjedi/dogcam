@@ -14,6 +14,10 @@ The controller software used for the current dog camera that's used on stream.
 
 Once physically built and installed, run main.py. The servo web interface is accessible on the Pi's IP address on port 8080. This repro contains only the basic drivers and movement controllers, and does not do computer vision (see the AI project for this). The websocket server is located at the IP address on port 5867.
 
+## Servo Control
+
+This project supports moving the servos directly from the GPIO or using a [servo hat](https://www.adafruit.com/product/2327) for the Raspberry Pi. If it's decided to use the servo hat, make sure to mark all servos in the configs as having a type of "ada". This will use ServoKit over the GPIO library.
+
 ## Robotics
 
 This repo includes the 3D model files used for this project. These have been modified for compatibility and modularity between the various parts used. 
