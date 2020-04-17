@@ -110,4 +110,4 @@ class DogCamServoBase():
 
         continue
 
-      await asyncio.sleep(0.4)
+      await asyncio.sleep(0.2)

@@ -1,6 +1,5 @@
 from adafruit_servokit import ServoKit
 from dcservo import DogCamServoBase
-import time
 
 # Don't export ServoLib
 __all__ = ("DogCamServoAda")
@@ -20,5 +19,3 @@ class DogCamServoAda(DogCamServoBase):
     print(f"{self.Name}: Moving to position {angle}")
     
     ServoLib.servo[self.Pin].angle = angle
-    time.sleep(0.3)
-    
