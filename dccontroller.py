@@ -4,7 +4,8 @@ import json
 
 class DogCamController():
   __Servos = {}
-  __RelAngle = 0.0
+  __RelPanAngle = 0.0
+  __RelTiltAngle = 0.0
   AIDisabled = False
   Instance = None
   
@@ -33,7 +34,13 @@ class DogCamController():
     with open("./config.json","r") as cfg_file:
       ConfigBlob = json.load(cfg_file)
       
-      self.__RelAngle = ConfigBlob["DefaultRelativeAngle"]
+      # Default Angles
+      if "DefaultRelativeAngle" in ConfigBlob:
+        self.__RelPanAngle = self.__RelTiltAngle = ConfigBlob["DefaultRelativeAngle"]
+      else:
+        self.__RelTiltAngle = ConfigBlob["DefaultRelativeTiltAngle"]
+        self.__RelPanAngle = ConfigBlob["DefaultRelativePanAngle"]
+      
       for item in ConfigBlob["Servos"]:
         if not "name" in item or not "pin" in item or not "start" in item:
           raise KeyError("Missing required configuration!")
@@ -102,13 +109,13 @@ class DogCamController():
       print(f"Servo {ServoName.lower()} is not a valid servo!")
   
   def MoveServoLeft(self):
-    self.MoveServoTo("pan", RelativeAngle=-self.__RelAngle)
+    self.MoveServoTo("pan", RelativeAngle=-self.__RelPanAngle)
   def MoveServoRight(self):
-    self.MoveServoTo("pan", RelativeAngle=self.__RelAngle)
+    self.MoveServoTo("pan", RelativeAngle=self.__RelPanAngle)
   def MoveServoUp(self):
-    self.MoveServoTo("tilt", RelativeAngle=-self.__RelAngle)
+    self.MoveServoTo("tilt", RelativeAngle=-self.__RelTiltAngle)
   def MoveServoDown(self):
-    self.MoveServoTo("tilt", RelativeAngle=self.__RelAngle)
+    self.MoveServoTo("tilt", RelativeAngle=self.__RelTiltAngle)
     
   def ResetServo(self, ServoName:str):
     if ServoName.lower() in self.__Servos:
