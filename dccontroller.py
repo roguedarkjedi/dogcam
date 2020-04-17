@@ -1,4 +1,4 @@
-from dcservo import DogCamServo
+from dcservoraw import DogCamServoRaw
 import json
 
 class DogCamController():
