@@ -49,7 +49,7 @@ class DogCamController():
         if "high" in item:
           HighBound = item["high"]
 
-        self.__Servos[Name] = DogCamServo(Name, item["pin"], item["start"], 
+        self.__Servos[Name] = DogCamServoRaw(Name, item["pin"], item["start"], 
           item["pulse"], ZeroAngle=ZeroLoc, Steps=Step, LowerBounds=LowBound,
           UpperBounds=HighBound)
         print(f"Imported servo: {Name}")
