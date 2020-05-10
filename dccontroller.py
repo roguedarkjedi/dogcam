@@ -72,8 +72,8 @@ class DogCamController():
         NewServo = None
         
         if Type.lower() == "ada":
-          NewServo = DogCamServoAda(Name, item["pin"], ZeroAngle=ZeroLoc, 
-          Steps=Step, LowerBounds=LowBound, UpperBounds=HighBound, PulseWidthMin=PulseMin, 
+          NewServo = DogCamServoAda(Name, item["pin"], ZeroAngle=ZeroLoc,
+          Steps=Step, LowerBounds=LowBound, UpperBounds=HighBound, PulseWidthMin=PulseMin,
           PulseWidthMax=PulseMax)
         else:
           # Initialize GPIO
@@ -81,7 +81,7 @@ class DogCamController():
             DogCamServoRaw.InitGPIO()
             self.IsUsingGPIO = True
           
-          NewServo = DogCamServoRaw(Name, item["pin"], item["start"], item["pulse"], 
+          NewServo = DogCamServoRaw(Name, item["pin"], item["start"], item["pulse"],
           ZeroAngle=ZeroLoc, Steps=Step, LowerBounds=LowBound, UpperBounds=HighBound)
 
         self.__Servos[Name] = NewServo
@@ -130,7 +130,7 @@ class DogCamController():
   def StopServoLoops(self):
     for servo in self.__Servos.values():
       servo.ShouldLoop = False
-      
+ 
   def GetCurrentAngle(self, ServoName:str):
     if ServoName.lower() in self.__Servos:
       return self.__Servos[ServoName.lower()].GetCurrentAngle()
