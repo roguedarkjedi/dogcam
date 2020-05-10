@@ -99,7 +99,7 @@ class DogCamServoBase():
           WillOverShot = Movement >= self._TargetAngle
         
         print(f"{self.Name}: moving {Movement} to {self._TargetAngle}")
-        
+
         if WillOverShot or self._TargetAngle < self._LowerBounds or self._TargetAngle > self._UpperBounds:
           print(f"{self.Name}: We there")
           self._ServoDelta = 0.0
