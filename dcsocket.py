@@ -20,10 +20,10 @@ class DogCamWebSocket():
   def RunServer(self):
     self.WSLoop = asyncio.new_event_loop()
     asyncio.set_event_loop(self.WSLoop)
-    self.WSLoop.run_until_complete(websockets.serve(DCHandler, "", 5867))
+    self.WSLoop.run_until_complete(websockets.serve(DCWebSocketHandler, "", 5867))
     self.WSLoop.run_forever()
   
-async def DCHandler(websocket, path):
+async def DCWebSocketHandler(websocket, path):
   print("Handling websocket messages")
   async for RawData in websocket:
 
