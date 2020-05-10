@@ -9,7 +9,7 @@ async def main():
   dcserver.StartWebserver()
   
   print(f"Camera Controller at {str(CamControl)} and\nSocket Server at {str(SocketServer)}")
-  
+
   while True:
     try:
       await asyncio.sleep(5)
