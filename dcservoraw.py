@@ -36,6 +36,6 @@ class DogCamServoRaw(DogCamServoBase):
     
     # Give hardware time to move
     time.sleep(0.2)
-    
+
     # Do not repeat the duty cycle commands, flush them
     self.__Hardware.ChangeDutyCycle(0)
