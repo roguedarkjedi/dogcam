@@ -60,7 +60,7 @@ class DogCamServoBase():
     
   def MoveToInterpAngle(self, angle):
     if angle == self._ZeroAngle:
-      self.Reset()
+      self._SetTargetAngle(self._ZeroAngle)
     else:
       self._SetTargetAngle(angle)
 
@@ -69,12 +69,15 @@ class DogCamServoBase():
   def GetCurrentAngle(self):
     return self._CurrentAngle
     
-  def Reset(self):
-    self._TargetAngle = self._CurrentAngle = self._ZeroAngle
-    
-    self._MoveToPosition(self._ZeroAngle)
-    time.sleep(1)
-    self._MoveToPosition(self._ZeroAngle)
+  def Reset(self, Smooth=False):
+    if Smooth is True:
+      self._SetTargetAngle(self._ZeroAngle)
+    else:
+      self._TargetAngle = self._CurrentAngle = self._ZeroAngle
+      
+      self._MoveToPosition(self._ZeroAngle)
+      time.sleep(1)
+      self._MoveToPosition(self._ZeroAngle)
     
     print(f"{self.Name}: reset")
     
@@ -108,6 +111,6 @@ class DogCamServoBase():
         else:
           await self.__InterpPosition(Movement)
 
-        continue
+        #continue
 
       await asyncio.sleep(0.2)

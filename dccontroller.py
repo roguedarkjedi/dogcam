@@ -103,7 +103,7 @@ class DogCamController():
         TheAngle = InterpAngle
       else:
         TheAngle = 0.0
-        TheServo.Reset()
+        TheServo.Reset(Smooth=True)
       print(f"Moving {ServoName} to {TheAngle}")
     else:
       print(f"Servo {ServoName.lower()} is not a valid servo!")
@@ -119,13 +119,13 @@ class DogCamController():
     
   def ResetServo(self, ServoName:str):
     if ServoName.lower() in self.__Servos:
-      self.__Servos[ServoName.lower()].Reset()
+      self.__Servos[ServoName.lower()].Reset(Smooth=True)
     else:
       print(f"Servo {ServoName.lower()} does not exist!")
       
   def ResetAllServos(self):
     for servo in self.__Servos.values():
-      servo.Reset()
+      servo.Reset(Smooth=True)
 
   def StopServoLoops(self):
     for servo in self.__Servos.values():
