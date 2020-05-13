@@ -17,5 +17,7 @@ class DogCamServoAda(DogCamServoBase):
 
   def _MoveToPosition(self, angle):
     print(f"{self.Name}: Moving to position {angle}")
-
-    ServoLib.servo[self.Pin].angle = angle
+    try:
+      ServoLib.servo[self.Pin].angle = angle
+    except Exception as ex:
+      print(f"{self.Name}: Could not move position to {angle}!\n{ex}")
