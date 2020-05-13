@@ -111,6 +111,4 @@ class DogCamServoBase():
         else:
           await self.__InterpPosition(Movement)
 
-        #continue
-
       await asyncio.sleep(0.2)
