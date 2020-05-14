@@ -11,18 +11,18 @@ __all__ = ("DogCamWebSocket")
 class DogCamWebSocket():
   WSThread = None
   WSLoop = None
-  
+
   def __init__(self):
     print("Starting websocket")
     self.WSThread = threading.Thread(target=self.RunServer, daemon=True)
     self.WSThread.start()
-  
+
   def RunServer(self):
     self.WSLoop = asyncio.new_event_loop()
     asyncio.set_event_loop(self.WSLoop)
     self.WSLoop.run_until_complete(websockets.serve(DCWebSocketHandler, "", 5867))
     self.WSLoop.run_forever()
-  
+
 async def DCWebSocketHandler(websocket, path):
   print("Handling websocket messages")
   async for RawData in websocket:
@@ -36,18 +36,18 @@ async def DCWebSocketHandler(websocket, path):
     # Require flags in request
     if "action" not in jsonData:
       continue
-    
+
     DCCI = DogCamController.Instance
     if "servo" not in jsonData:
       ServoName = "none"
     else:
       ServoName = jsonData["servo"].lower()
-    
+
     ActionSource = jsonData.get("source")
     ServoAction = jsonData["action"].lower()
     ServoAngle = jsonData.get("angle")
     ActionHandled = True
-    
+
     if ActionSource == "dogcamai" and DCCI.AIDisabled is True:
       ActionHandled = False
     elif ServoAction == "disableai":
@@ -82,7 +82,7 @@ async def DCWebSocketHandler(websocket, path):
     else:
       print("Message unhandled!")
       ActionHandled = False
-      
+
     ResponseBlob = {"time": str(datetime.now()),
                     "status": ActionHandled,
                     "action": ServoAction,
