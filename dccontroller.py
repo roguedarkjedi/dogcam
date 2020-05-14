@@ -8,39 +8,39 @@ class DogCamController():
   __RelTiltAngle = 0.0
   AIDisabled = False
   Instance = None
-  
+
   def __init__(self):
     if DogCamController.Instance is None:
       DogCamController.Instance = self
     else:
       self = DogCamController.Instance
       return
-    
+
     self.__ReadConfig()
     print("DogCam Ready")
-    
+
   def __del__(self):
     print("Shutting down robot")
     self.ResetAllServos()
     self.StopServoLoops()
     self.__Servos = {}
-    
+
     if self.IsUsingGPIO is True:
       DogCamServoRaw.CleanupGPIO()
 
   def __ReadConfig(self):
     self.IsUsingGPIO = False
-    
+
     with open("./config.json","r") as cfg_file:
       ConfigBlob = json.load(cfg_file)
-      
+
       # Default Angles
       if "DefaultRelativeAngle" in ConfigBlob:
         self.__RelPanAngle = self.__RelTiltAngle = ConfigBlob["DefaultRelativeAngle"]
       else:
         self.__RelTiltAngle = ConfigBlob["DefaultRelativeTiltAngle"]
         self.__RelPanAngle = ConfigBlob["DefaultRelativePanAngle"]
-      
+
       for item in ConfigBlob["Servos"]:
         if not "name" in item or not "pin" in item or not "start" in item:
           raise KeyError("Missing required configuration!")
@@ -62,15 +62,15 @@ class DogCamController():
           LowBound = item["low"]
         if "high" in item:
           HighBound = item["high"]
-          
+
         if "pulsemin" in item:
           PulseMin = item["pulsemin"]
-          
+
         if "pulsemax" in item:
           PulseMax = item["pulsemax"]
-        
+
         NewServo = None
-        
+
         if Type.lower() == "ada":
           NewServo = DogCamServoAda(Name, item["pin"], ZeroAngle=ZeroLoc,
           Steps=Step, LowerBounds=LowBound, UpperBounds=HighBound, PulseWidthMin=PulseMin,
@@ -80,7 +80,7 @@ class DogCamController():
           if self.IsUsingGPIO is False:
             DogCamServoRaw.InitGPIO()
             self.IsUsingGPIO = True
-          
+
           NewServo = DogCamServoRaw(Name, item["pin"], item["start"], item["pulse"],
           ZeroAngle=ZeroLoc, Steps=Step, LowerBounds=LowBound, UpperBounds=HighBound)
 
@@ -107,7 +107,7 @@ class DogCamController():
       print(f"Moving {ServoName} to {TheAngle}")
     else:
       print(f"Servo {ServoName.lower()} is not a valid servo!")
-  
+
   def MoveServoLeft(self):
     self.MoveServoTo("pan", RelativeAngle=-self.__RelPanAngle)
   def MoveServoRight(self):
@@ -116,13 +116,13 @@ class DogCamController():
     self.MoveServoTo("tilt", RelativeAngle=-self.__RelTiltAngle)
   def MoveServoDown(self):
     self.MoveServoTo("tilt", RelativeAngle=self.__RelTiltAngle)
-    
+
   def ResetServo(self, ServoName:str):
     if ServoName.lower() in self.__Servos:
       self.__Servos[ServoName.lower()].Reset(Smooth=True)
     else:
       print(f"Servo {ServoName.lower()} does not exist!")
-      
+
   def ResetAllServos(self):
     for servo in self.__Servos.values():
       servo.Reset(Smooth=True)
@@ -130,7 +130,7 @@ class DogCamController():
   def StopServoLoops(self):
     for servo in self.__Servos.values():
       servo.ShouldLoop = False
- 
+
   def GetCurrentAngle(self, ServoName:str):
     if ServoName.lower() in self.__Servos:
       return self.__Servos[ServoName.lower()].GetCurrentAngle()
