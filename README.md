@@ -1,5 +1,7 @@
 # dogcam
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6b37aa9b42a04808a9c091e0692f1e88)](https://app.codacy.com/manual/roguedarkjedi/dogcam?utm_source=github.com&utm_medium=referral&utm_content=roguedarkjedi/dogcam&utm_campaign=Badge_Grade_Settings)
+
 The controller software used for the current dog camera that's used on stream.
 
 ## Features:
