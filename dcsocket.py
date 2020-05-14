@@ -23,10 +23,12 @@ class DogCamWebSocket():
     self.WSLoop.run_until_complete(websockets.serve(DCWebSocketHandler, "", 5867))
     self.WSLoop.run_forever()
 
+# Websocket message handler
 async def DCWebSocketHandler(websocket, path):
   print("Handling websocket messages")
-  async for RawData in websocket:
 
+  # Poll messages forever
+  async for RawData in websocket:
     try:
       jsonData = json.loads(RawData)
     except Exception as ex:
@@ -38,16 +40,21 @@ async def DCWebSocketHandler(websocket, path):
       continue
 
     DCCI = DogCamController.Instance
+
+    # Attempt to figure out what servo this should target
     if "servo" not in jsonData:
+      # Likely a both command then
       ServoName = "none"
     else:
       ServoName = jsonData["servo"].lower()
 
+    # Pull some information regarding the command
     ActionSource = jsonData.get("source")
     ServoAction = jsonData["action"].lower()
     ServoAngle = jsonData.get("angle")
     ActionHandled = True
 
+    # Handle the command in the ugliest fashion possible
     if ActionSource == "dogcamai" and DCCI.AIDisabled is True:
       ActionHandled = False
     elif ServoAction == "disableai":
@@ -83,6 +90,7 @@ async def DCWebSocketHandler(websocket, path):
       print("Message unhandled!")
       ActionHandled = False
 
+    # Generate response message JSON for clients that need to know current status
     ResponseBlob = {"time": str(datetime.now()),
                     "status": ActionHandled,
                     "action": ServoAction,
@@ -91,4 +99,5 @@ async def DCWebSocketHandler(websocket, path):
                     "panCurrentAngle": DCCI.GetCurrentAngle("pan")}
 
     print("Sending reply")
+    # Push the message back.
     await websocket.send(json.dumps(ResponseBlob))
