@@ -55,4 +55,4 @@ Hindsight is 20/20. If you take on dogcam for your own project, here's some chan
 * Use a different panoramic base servo, while the TowerPro is powerful enough, it is limited by a small turning angle. To switch servos would require a rework of the base model for space.
 * Make the tilt arm easier to install (likely by shortening the servo horn). It is very hard to modify and fit onto the existing space.
 * Make the control webpage less jank by actually bothering to write it correctly.
-* Shorten the clamps used to hold the phone, they are slightly too large.
+* Shorten the clamps used to hold the phone, they are slightly too large (originally designed to hold a thermal case, but that ended up not being necessary, and contributed negatively to torque, but now the clamps are too long).
