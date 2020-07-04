@@ -43,5 +43,16 @@ These above parts are licensed under the [Creative Commons - Attribution - Share
 
 Servos used:
 
-* TowerPro MG90D (base)
-* Futaba S3004
+* TowerPro MG90D (pan)
+* [ANNIMOS DS3218MG](https://www.amazon.com/gp/product/B076CNKQX4/) (tilt)
+
+
+## Improvements to this project
+
+Hindsight is 20/20. If you take on dogcam for your own project, here's some changes that can be made that would totally improve the overall result:
+
+* Fix the pan hat so that a servo horn fits properly into the existing groove. This would eliminate a lot of issues with precision when it comes to moving the pan servo.
+* Use a different panoramic base servo, while the TowerPro is powerful enough, it is limited by a small turning angle. To switch servos would require a rework of the base model for space.
+* Make the tilt arm easier to install (likely by shortening the servo horn). It is very hard to modify and fit onto the existing space.
+* Make the control webpage less jank by actually bothering to write it correctly.
+* Shorten the clamps used to hold the phone, they are slightly too large.
