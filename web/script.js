@@ -4,10 +4,17 @@ var tiltAngle;
 var aiStatusText;
 var websocket;
 var aiStatus=false;
+var hiddenConsole=true;
 
 /*
 A lot of code is shamelessly copied from https://www.websocket.org/echo.html and is pretty awful.
 */
+
+function toggleConsole()
+{
+  hiddenConsole = !hiddenConsole;
+  document.getElementById("devConsole").hidden = hiddenConsole;
+}
 
 function writeToScreen(message)
 {
@@ -88,6 +95,15 @@ function resetAll()
   websocket.send('{"servo": "tilt", "action": "resetall"}');
 }
 
+function setExactAngle(servoType)
+{
+  var inputValue = window.prompt("Set angle for "+servoType);
+  if(inputValue != null && !isNaN(inputValue))
+  {
+    websocket.send('{"servo": "'+servoType+'", "action": "moveinterp", "angle": '+inputValue+'}');
+  }
+}
+
 function toggleAI()
 {
   var aiCommand = (aiStatus) ? "enableai" : "disableai";
@@ -97,10 +113,11 @@ function toggleAI()
 
 function CreateWebsocket()
 {
-  output = document.getElementById("robotconsole");
+  output = document.getElementById("msgLog");
   panAngle = document.getElementById("panangle");
   tiltAngle = document.getElementById("tiltangle");
   aiStatusText = document.getElementById("aistatus");
+  aiStatusText.innerHTML = aiStatus;
   
   websocket = new WebSocket("ws://"+window.location.hostname+":5867/");
   websocket.onopen = function(evt) { onOpen(); };
