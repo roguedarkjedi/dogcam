@@ -10,7 +10,7 @@
 	"pin": 0,
 	"start": 3.0,
 	"pulse": 18.0,
-  "step": 4.0,
+  	"step": 4.0,
 	"zero": 4,
 	"low": 4,
 	"high": 155,
@@ -23,10 +23,10 @@
 	"pin": 1,
 	"start": 2.2,
 	"pulse": 18.0,
-	"low": 1.2,
-	"high": 36,
-	"zero": 10,
-	"pulsemin": 18.11,
-	"pulsemax": 1521.2
+	"low": 38,
+	"high": 58,
+	"zero": 45,
+	"pulsemin": 500,
+	"pulsemax": 2000
    }]
 }
