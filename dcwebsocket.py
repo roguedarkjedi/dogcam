@@ -42,7 +42,7 @@ class DogCamWebSocket():
                     "AIDisabled": DCCI.AIDisabled}
 
     if AttachAngles:
-      ResponseBlob.append({
+      ResponseBlob.update({
         "tiltCurrentAngle": DCCI.GetCurrentAngle("tilt"),
         "panCurrentAngle": DCCI.GetCurrentAngle("pan")
       })
