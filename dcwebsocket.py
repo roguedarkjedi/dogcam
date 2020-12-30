@@ -25,32 +25,32 @@ class DogCamWebSocket():
   async def SendToAllClients(self, Message, MsgType="info"):
     if len(self.__clients) == 0:
       return
-    
+
     await asyncio.wait([self.SendMessageToClient(client, Message, MsgType) for client in self.__clients])
-    
+
   async def SendMessageToClient(self, websocket, Msg, MsgType="info", WasHandled=True, AttachAngles=False):
     if websocket is None:
       return
-    
+
     DCCI = DogCamController.Instance
-    
+
     # Generate response message JSON for clients that need to know current status
     ResponseBlob = {"time": str(datetime.now()),
                     "status": WasHandled,
                     "type": MsgType,
                     "data": Msg,
                     "AIDisabled": DCCI.AIDisabled}
-    
+
     if AttachAngles:
       ResponseBlob.append({
         "tiltCurrentAngle": DCCI.GetCurrentAngle("tilt"),
         "panCurrentAngle": DCCI.GetCurrentAngle("pan")
       })
-      
+
     print(f"Sending reply to {websocket.remote_address}")
     # Push the message back.
     await websocket.send(json.dumps(ResponseBlob))
-    
+
   # Handles the lifetime of all the clients
   async def __ClientConnection(self, websocket, path):
     # While unlikely, if we hit any exceptions, we need to make sure to get rid of the socket data
@@ -115,7 +115,7 @@ class DogCamWebSocket():
       # The ugliest branch conditional ever
       elif ActionType == "action":
         ServoAngle = jsonData.get("angle")
-        
+
         if ActionSource == "dogcamai" and DCCI.AIDisabled is True:
           ActionHandled = False
           SendAngles = False
