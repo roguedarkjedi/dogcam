@@ -32,6 +32,8 @@ class DogCamWebSocket():
     if websocket is None:
       return
     
+    DCCI = DogCamController.Instance
+    
     # Generate response message JSON for clients that need to know current status
     ResponseBlob = {"time": str(datetime.now()),
                     "status": WasHandled,
