@@ -21,7 +21,7 @@ class DogCamWebSocket():
     asyncio.set_event_loop(self.WSLoop)
     self.WSLoop.run_until_complete(websockets.serve(self.__ClientConnection, "", 5867))
     self.WSLoop.run_forever()
-    
+
   async def SendToAllClients(self, Message, MsgType="info"):
     if len(self.__clients) == 0:
       return
