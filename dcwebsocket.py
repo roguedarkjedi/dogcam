@@ -105,7 +105,7 @@ class DogCamWebSocket():
         if not "message" in jsonData:
           # Doesn't exist so don't even bother
           continue
-        MessageData = str(jsonData["message"]).encode(encoding="ascii", errors="replace")
+        MessageData = str(str(jsonData["message"]).encode(encoding="ascii", errors="replace"))
         await self.SendToAllClients(MessageData, ActionType)
         continue
       elif ActionType == "status":
