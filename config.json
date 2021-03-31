@@ -1,8 +1,8 @@
 {
   "DefaultHigh": 180,
   "DefaultStep": 1.0,
-  "DefaultRelativePanAngle": 12.0,
-  "DefaultRelativeTiltAngle": 3.0,
+  "DefaultRelativePanAngle": 6.0,
+  "DefaultRelativeTiltAngle": 2.0,
   "RelativeLeftIsNegative": false,
   "Servos": 
   [{
