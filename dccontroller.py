@@ -6,6 +6,7 @@ class DogCamController():
   __Servos = {}
   __RelPanAngle = 0.0
   __RelTiltAngle = 0.0
+  __LeftIsNegative = False
   AIDisabled = False
   Instance = None
 
@@ -40,6 +41,9 @@ class DogCamController():
       else:
         self.__RelTiltAngle = ConfigBlob["DefaultRelativeTiltAngle"]
         self.__RelPanAngle = ConfigBlob["DefaultRelativePanAngle"]
+
+      if "RelativeLeftIsNegative" in ConfigBlob:
+        self.__LeftIsNegative = ConfigBlob["RelativeLeftIsNegative"]
 
       for item in ConfigBlob["Servos"]:
         if not "name" in item or not "pin" in item or not "start" in item:
@@ -109,9 +113,15 @@ class DogCamController():
       print(f"Servo {ServoName.lower()} is not a valid servo!")
 
   def MoveServoLeft(self):
-    self.MoveServoTo("pan", RelativeAngle=-self.__RelPanAngle)
+    MoveAngle = self.__RelPanAngle
+    if self.__LeftIsNegative is True:
+      MoveAngle *= -1
+    self.MoveServoTo("pan", RelativeAngle=MoveAngle)
   def MoveServoRight(self):
-    self.MoveServoTo("pan", RelativeAngle=self.__RelPanAngle)
+    MoveAngle = -self.__RelPanAngle
+    if self.__LeftIsNegative is True:
+      MoveAngle *= -1
+    self.MoveServoTo("pan", RelativeAngle=MoveAngle)
   def MoveServoUp(self):
     self.MoveServoTo("tilt", RelativeAngle=-self.__RelTiltAngle)
   def MoveServoDown(self):

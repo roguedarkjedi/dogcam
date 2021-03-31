@@ -3,6 +3,7 @@
   "DefaultStep": 1.0,
   "DefaultRelativePanAngle": 12.0,
   "DefaultRelativeTiltAngle": 3.0,
+  "RelativeLeftIsNegative": false,
   "Servos": 
   [{
 	"name": "pan",
